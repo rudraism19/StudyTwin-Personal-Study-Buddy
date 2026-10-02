@@ -29,7 +29,7 @@ StudyTwin gives Rahul a judgment-free, interactive study buddy:
 
 ## Demo
 
-The application runs locally with a modern, student-friendly dark indigo interface.
+live link - https://study-twin-personal-study-buddy.vercel.app/
 
 ### Key Screenshots & UI Flow
 - **Home & Dedication Banner:** Highlights the *"Built for a Friend"* personal story with an inline ✏️ customization tool to change the friend's name for anyone.
