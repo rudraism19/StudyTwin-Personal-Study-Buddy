@@ -1,0 +1,61 @@
+name: StudyTwin CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  # Job 1: Test & Lint
+  test:
+    name: Run Automated Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Test Suite
+        run: |
+          python test_app.py
+
+  # Job 2: Deploy to Production
+  deploy:
+    name: Deploy Web Application
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deployment
+        if: env.RENDER_DEPLOY_HOOK != ''
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "Triggering automated deploy to Render..."
+          curl -sS -X POST "$RENDER_DEPLOY_HOOK"
+          echo "Deployment webhook triggered successfully!"
+
+      - name: Informative Notice
+        if: env.RENDER_DEPLOY_HOOK == ''
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "=========================================================="
+          echo "All tests passed successfully!"
+          echo "To enable automatic deployment, add RENDER_DEPLOY_HOOK to"
+          echo "your GitHub Repository Secrets (Settings -> Secrets -> Actions)."
+          echo "=========================================================="
