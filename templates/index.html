@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyTwin — Your Personal AI Study Buddy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand" onclick="switchTab('ask')">
+        <div class="brand-logo">🎓</div>
+        <div class="brand-info">
+          <span class="brand-name">StudyTwin</span>
+          <span class="brand-tagline">Your personal AI study buddy</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="ask" onclick="switchTab('ask')">
+          <span class="nav-icon">💡</span> Ask AI
+        </button>
+        <button class="nav-btn" data-tab="quiz" onclick="switchTab('quiz')">
+          <span class="nav-icon">🎯</span> Practice Quiz
+        </button>
+        <button class="nav-btn" data-tab="tips" onclick="switchTab('tips')">
+          <span class="nav-icon">⚡</span> Study Tips
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="status-pill" id="ollamaStatusPill" title="Click to view Ollama connection info" onclick="openModelModal()">
+          <span class="status-dot status-checking"></span>
+          <span class="status-text" id="statusText">Checking Ollama...</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="main-content">
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <div class="hero-badge">✨ Hackathon Edition • "Build for a Friend"</div>
+      <h1 class="hero-title">
+        Never struggle with hard topics again. Meet your <span class="gradient-text">StudyTwin</span>.
+      </h1>
+      <p class="hero-subtitle">
+        Tailor-made explanations in plain English or casual Hinglish, relatable analogies, and interactive 5-question quizzes to lock in what you learn.
+      </p>
+
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="scrollToStudy('ask')">
+          <span>🚀 Start Studying</span>
+        </button>
+        <button class="btn btn-secondary" onclick="scrollToStudy('quiz')">
+          <span>🎯 Try a Quick Quiz</span>
+        </button>
+      </div>
+
+      <!-- DEDICATION CARD (BUILD FOR A FRIEND THEME) -->
+      <div class="friend-dedication-card">
+        <div class="dedication-header">
+          <div class="dedication-avatar">🤝</div>
+          <div class="dedication-title-group">
+            <span class="dedication-badge">Personal Project Dedication</span>
+            <h3 class="dedication-heading">
+              Built for: <span class="highlight-friend" id="friendNameDisplay">Rahul</span>
+              <button class="icon-btn-inline" id="editFriendBtn" onclick="editFriendName()" title="Change friend's name">✏️</button>
+            </h3>
+          </div>
+        </div>
+        <div class="dedication-grid">
+          <div class="dedication-item">
+            <span class="dedication-label">🚨 Problem:</span>
+            <p class="dedication-desc">
+              My friend struggles to understand difficult technical topics, gets overwhelmed by dry textbooks, and needs a simple way to practice without pressure.
+            </p>
+          </div>
+          <div class="dedication-item">
+            <span class="dedication-label">💡 Solution:</span>
+            <p class="dedication-desc">
+              StudyTwin explains topics in their preferred style (Simple English or friendly Hinglish) and creates quick personalized quizzes with clear review cards.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDY WORKSPACE -->
+    <section class="study-workspace" id="studyWorkspace">
+
+      <!-- TAB NAVIGATION -->
+      <div class="workspace-tabs">
+        <button class="tab-btn active" id="tab-ask" onclick="switchTab('ask')">
+          <span class="tab-icon">💡</span>
+          <span class="tab-label">1. Ask AI (Explainer)</span>
+        </button>
+        <button class="tab-btn" id="tab-quiz" onclick="switchTab('quiz')">
+          <span class="tab-icon">🎯</span>
+          <span class="tab-label">2. Generate Quiz</span>
+        </button>
+        <button class="tab-btn" id="tab-tips" onclick="switchTab('tips')">
+          <span class="tab-icon">⚡</span>
+          <span class="tab-label">3. Study Tips & Hacks</span>
+        </button>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SECTION 1: ASK AI EXPLAINER -->
+      <!-- ============================================ -->
+      <div class="tab-pane active" id="pane-ask">
+        <div class="card panel-card">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">What topic are you studying today?</h2>
+              <p class="panel-subtitle">Type any complex topic, coding concept, or exam question.</p>
+            </div>
+            <div class="style-toggle-group">
+              <span class="style-label">Explanation Style:</span>
+              <div class="radio-pills">
+                <label class="radio-pill">
+                  <input type="radio" name="explainStyle" value="simple_english" checked>
+                  <span>🇬🇧 Simple English</span>
+                </label>
+                <label class="radio-pill">
+                  <input type="radio" name="explainStyle" value="hinglish">
+                  <span>🇮🇳 Hinglish</span>
+                </label>
+                <label class="radio-pill">
+                  <input type="radio" name="explainStyle" value="eli10">
+                  <span>🎈 Like I'm 10</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-form">
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="askTopicInput" 
+                class="main-input" 
+                placeholder="e.g. Explain inheritance in Java, Time Complexity, HTTP vs HTTPS..."
+                autocomplete="off"
+              >
+              <button class="btn btn-primary btn-input-action" id="btnExplain" onclick="handleExplain()">
+                <span id="explainBtnText">Explain Concept</span>
+                <span class="spinner" id="explainSpinner" style="display: none;"></span>
+              </button>
+            </div>
+
+            <!-- QUICK TOPIC CHIPS -->
+            <div class="chips-container">
+              <span class="chips-label">Popular for college exams:</span>
+              <div class="chips-list">
+                <button class="chip" onclick="pickTopic('Explain inheritance in Java')">☕ Inheritance in Java</button>
+                <button class="chip" onclick="pickTopic('Time Complexity and Big O Notation')">⚡ Big O Notation</button>
+                <button class="chip" onclick="pickTopic('How HTTP vs HTTPS works')">🔒 HTTP vs HTTPS</button>
+                <button class="chip" onclick="pickTopic('Recursion vs Iteration with call stack')">🔄 Recursion</button>
+                <button class="chip" onclick="pickTopic('What is Virtual Memory and Paging')">💻 Virtual Memory</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXPLANATION RESULT CONTAINER -->
+          <div class="result-area" id="explanationResultArea" style="display: none;">
+            <div class="result-header">
+              <div class="result-meta">
+                <span class="badge badge-success" id="resultTopicBadge">Topic</span>
+                <span class="badge badge-info" id="resultStyleBadge">Simple English</span>
+                <span class="badge badge-neutral" id="resultSourceBadge">Ollama</span>
+              </div>
+              <div class="result-actions">
+                <button class="btn btn-sm btn-ghost" onclick="copyExplanation()" title="Copy to clipboard">
+                  📋 Copy
+                </button>
+                <button class="btn btn-sm btn-accent" onclick="startQuizFromTopic()">
+                  🎯 Practice This in a Quiz →
+                </button>
+              </div>
+            </div>
+
+            <div class="explanation-body markdown-rendered" id="explanationContent">
+              <!-- Rendered Explanation Here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SECTION 2: GENERATE QUIZ -->
+      <!-- ============================================ -->
+      <div class="tab-pane" id="pane-quiz">
+        <div class="card panel-card">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Test Your Understanding: 5-Question Quiz</h2>
+              <p class="panel-subtitle">Answer one question at a time. Review mistakes and clear misconceptions instantly.</p>
+            </div>
+          </div>
+
+          <!-- QUIZ GENERATOR INPUT -->
+          <div class="input-form" id="quizInputForm">
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="quizTopicInput" 
+                class="main-input" 
+                placeholder="Enter topic for quiz (e.g. Inheritance in Java, Big O Notation...)"
+                autocomplete="off"
+              >
+              <button class="btn btn-primary btn-input-action" id="btnGenQuiz" onclick="handleGenerateQuiz()">
+                <span id="quizBtnText">Generate 5 MCQs</span>
+                <span class="spinner" id="quizSpinner" style="display: none;"></span>
+              </button>
+            </div>
+            <div class="chips-container">
+              <span class="chips-label">Quick topics:</span>
+              <div class="chips-list">
+                <button class="chip" onclick="pickQuizTopic('Inheritance in Java')">☕ Java Inheritance</button>
+                <button class="chip" onclick="pickQuizTopic('Time Complexity and Big O')">⚡ Big O Analysis</button>
+                <button class="chip" onclick="pickQuizTopic('HTTP and Web Protocols')">🌐 Web Protocols</button>
+                <button class="chip" onclick="pickQuizTopic('SQL Joins and Queries')">🗄️ SQL Joins</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIVE QUIZ PLAYGROUND (STEPPER) -->
+          <div class="quiz-playground" id="quizPlayground" style="display: none;">
+            
+            <!-- PROGRESS BAR -->
+            <div class="quiz-stepper-header">
+              <div class="quiz-progress-info">
+                <span class="quiz-topic-indicator" id="quizCurrentTopic">Topic</span>
+                <span class="quiz-step-count" id="quizStepCounter">Question 1 of 5</span>
+              </div>
+              <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="quizProgressBar" style="width: 20%;"></div>
+              </div>
+            </div>
+
+            <!-- QUESTION CARD -->
+            <div class="quiz-card" id="quizCard">
+              <h3 class="quiz-question-text" id="quizQuestionText">Question text goes here...</h3>
+
+              <div class="quiz-options-grid" id="quizOptionsContainer">
+                <!-- 4 Options rendered by JS -->
+              </div>
+
+              <!-- IMMEDIATE FEEDBACK IF SELECTED -->
+              <div class="question-feedback-box" id="questionFeedbackBox" style="display: none;">
+                <div class="feedback-title" id="feedbackTitle"></div>
+                <div class="feedback-text" id="feedbackExplanation"></div>
+              </div>
+
+              <!-- NAVIGATION BUTTONS -->
+              <div class="quiz-nav-row">
+                <button class="btn btn-secondary" id="btnPrevQuestion" onclick="prevQuestion()" disabled>
+                  ← Previous
+                </button>
+                <div class="quiz-hint-msg" id="quizHintMsg">Select an option to proceed</div>
+                <button class="btn btn-primary" id="btnNextQuestion" onclick="nextQuestion()">
+                  Next Question →
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- QUIZ RESULTS SCREEN -->
+          <div class="quiz-results-screen" id="quizResultsScreen" style="display: none;">
+            <div class="results-summary-card">
+              <div class="results-score-badge" id="resultsBadge">🎉</div>
+              <h2 class="results-title" id="resultsTitle">Quiz Completed!</h2>
+              <p class="results-score-text">
+                You scored <strong id="resultsScoreNum">4</strong> out of <strong id="resultsTotalNum">5</strong>
+              </p>
+              <p class="results-feedback-message" id="resultsComment">
+                Awesome work! You've got a strong grip on this concept.
+              </p>
+
+              <div class="results-cta-row">
+                <button class="btn btn-primary" onclick="retakeCurrentQuiz()">
+                  🔄 Retake Quiz
+                </button>
+                <button class="btn btn-secondary" onclick="resetQuizView()">
+                  🎯 Try Another Topic
+                </button>
+                <button class="btn btn-ghost" onclick="switchTab('ask')">
+                  💡 Study Another Concept
+                </button>
+              </div>
+            </div>
+
+            <!-- DETAILED REVIEW SECTION (EXPLAIN INCORRECT ANSWERS) -->
+            <div class="results-review-container">
+              <div class="review-header">
+                <h3>Detailed Question Breakdown & Review</h3>
+                <p>Learn from every question: see why the correct choice works and where the tricky distractors mislead.</p>
+              </div>
+              <div class="review-items-list" id="reviewItemsList">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SECTION 3: STUDY TIPS & RETENTION HACKS -->
+      <!-- ============================================ -->
+      <div class="tab-pane" id="pane-tips">
+        <div class="card panel-card">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Smart Study Tips & Strategies</h2>
+              <p class="panel-subtitle">Cognitive science techniques to memorize faster and study with less stress.</p>
+            </div>
+          </div>
+
+          <!-- TAILORED TIPS GENERATOR -->
+          <div class="tips-generator-box">
+            <h3 class="tips-gen-title">Get AI Study Hacks for Any Tricky Subject:</h3>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="tipsTopicInput" 
+                class="main-input" 
+                placeholder="e.g. Operating Systems, Calculus, Dynamic Programming, Organic Chemistry..."
+              >
+              <button class="btn btn-primary btn-input-action" id="btnGenTips" onclick="handleGenerateTips()">
+                <span id="tipsBtnText">Generate Hacks</span>
+                <span class="spinner" id="tipsSpinner" style="display: none;"></span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CUSTOM TIPS RESULT -->
+          <div class="tips-result-box" id="tipsResultBox" style="display: none;">
+            <div class="tips-result-header">
+              <span class="badge badge-accent">Personalized Study Strategy</span>
+              <span class="tips-target-topic" id="tipsTopicDisplay">Topic</span>
+            </div>
+            <div class="markdown-rendered tips-rendered-content" id="tipsContent"></div>
+          </div>
+
+          <!-- SCIENTIFIC STUDY FRAMEWORKS -->
+          <div class="tips-frameworks-grid">
+            <div class="framework-card">
+              <div class="framework-icon">👨‍🏫</div>
+              <h4 class="framework-title">The Feynman Technique</h4>
+              <p class="framework-desc">
+                Explain what you just learned in plain words as if teaching your best friend. If you hit a wall or have to use textbook jargon, that is your exact blind spot. Re-read just that part!
+              </p>
+              <div class="framework-tag">Retention: 90%</div>
+            </div>
+
+            <div class="framework-card">
+              <div class="framework-icon">⏱️</div>
+              <h4 class="framework-title">25/5 Pomodoro Cadence</h4>
+              <p class="framework-desc">
+                Study for 25 distraction-free minutes (phone out of sight), followed by 5 minutes of stretching. Your brain consolidates short-term memories during rest intervals.
+              </p>
+              <div class="framework-tag">Focus Booster</div>
+            </div>
+
+            <div class="framework-card">
+              <div class="framework-icon">📝</div>
+              <h4 class="framework-title">The Blurting Method</h4>
+              <p class="framework-desc">
+                Read a topic for 15 minutes. Close the book, take a blank sheet of paper, and scribble down everything you can recall. Check against your notes in red pen.
+              </p>
+              <div class="framework-tag">Active Recall</div>
+            </div>
+
+            <div class="framework-card">
+              <div class="framework-icon">📅</div>
+              <h4 class="framework-title">Spaced Repetition</h4>
+              <p class="framework-desc">
+                Review key definitions at Day 1, Day 3, and Day 7. This flattens Ebbinghaus's Forgetting Curve and moves concepts into permanent memory before exams.
+              </p>
+              <div class="framework-tag">Long-Term Memory</div>
+            </div>
+          </div>
+
+          <!-- MINI POMODORO TIMER -->
+          <div class="pomodoro-widget card">
+            <div class="pomodoro-left">
+              <h4>⏱️ Quick Study Timer</h4>
+              <p>Start a focused 25-minute sprint with StudyTwin.</p>
+            </div>
+            <div class="pomodoro-timer-display" id="pomoTime">25:00</div>
+            <div class="pomodoro-controls">
+              <button class="btn btn-sm btn-primary" id="btnPomoToggle" onclick="togglePomodoro()">Start Focus</button>
+              <button class="btn btn-sm btn-ghost" onclick="resetPomodoro()">Reset</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- OLLAMA MODEL / CONNECTION SETTINGS MODAL -->
+  <div class="modal-overlay" id="modelModal" style="display: none;" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🤖</span>
+          <h3>Local AI Engine (Ollama)</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeModelModal()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-status-box" id="modalStatusBox">
+          <div class="status-indicator-big">
+            <span class="status-dot status-offline" id="modalStatusDot"></span>
+            <strong id="modalStatusHeadline">Ollama is Offline</strong>
+          </div>
+          <p id="modalStatusMessage" class="modal-status-text">
+            StudyTwin is currently running in <strong>Smart Offline Demo Mode</strong>.
+          </p>
+        </div>
+
+        <div class="modal-field">
+          <label>Ollama Server Endpoint:</label>
+          <input type="text" id="modalBaseUrl" class="main-input input-sm" value="http://127.0.0.1:11434" readonly>
+        </div>
+
+        <div class="modal-field">
+          <label>Active Local Model:</label>
+          <div class="select-wrapper">
+            <select id="modelSelect" class="main-select">
+              <option value="llama3.2">llama3.2 (Recommended)</option>
+              <option value="qwen2.5">qwen2.5 (Great for Coding)</option>
+              <option value="qwen2.5:3b">qwen2.5:3b (Ultra Fast)</option>
+              <option value="llama3">llama3:8b</option>
+              <option value="mistral">mistral:7b</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-instructions">
+          <h4>💡 How to run local models on your laptop:</h4>
+          <ol>
+            <li>Download Ollama from <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a>.</li>
+            <li>Open terminal and run: <code>ollama run llama3.2</code> or <code>ollama run qwen2.5</code></li>
+            <li>Click <strong>Check Connection</strong> below. Your StudyTwin will immediately use your local LLM!</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModelModal()">Close</button>
+        <button class="btn btn-primary" onclick="refreshOllamaStatus()">
+          🔄 Refresh Connection
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRIEND NAME EDIT MODAL -->
+  <div class="modal-overlay" id="friendModal" style="display: none;" onclick="closeFriendModalOnBackdrop(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🤝</span>
+          <h3>Personalize: Who is this built for?</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeFriendModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Enter your friend's name to personalize StudyTwin's dedication and study messages:
+        </p>
+        <div class="modal-field">
+          <input type="text" id="friendNameInput" class="main-input" placeholder="e.g. Rahul, Priya, Alex, Jordan...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeFriendModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveFriendName()">Save & Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <strong>StudyTwin</strong> — Built for a Friend Hackathon Project
+        <span class="footer-sub">Private • Local • Powered by Open-Weight LLMs (Ollama)</span>
+      </div>
+      <div class="footer-right">
+        <span class="privacy-tag">🔒 Zero cloud telemetry. Everything stays on your machine.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
