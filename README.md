@@ -2,6 +2,8 @@
 
 *This is a submission for the [Hacktoberfest Weekend Challenge: Build for a Friend](https://dev.to/challenges/hacktoberfest-weekend-2026-10-01)*
 
+![StudyTwin Cover Banner](cover.jpg)
+
 ---
 
 ## What I Built
